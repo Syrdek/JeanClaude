@@ -1,0 +1,76 @@
+#!/bin/bash
+MESSAGE="$1"
+# @t0087865
+#CHANNEL="ikopfaz5z7bsiph4gdb5jkmota"
+# Off Topic
+CHANNEL="wxjfbe578frkiefj1bax4cqh3h"
+# Hades
+#CHANNEL="b4tw8yqk5pgxzdtm6qfazp85bc"
+# OffTopic Hades
+#CHANNEL="1r37i937ifftdg3bucfgp3o3zw"
+
+CHANNEL_NAME="@t0087865"
+TOKEN="e3h8r7t7yir73xy7z7jdfjsehe"
+
+
+usage() {
+        if [ $# -gt 0 ]
+        then
+              log -e "\033[0;31mERROR: $@\033[0m"
+              log
+        fi
+        log "Usage: $0 --channel CHANNEL MESSAGE"
+        log
+        log "Exécute trto plusieurs en parallèle pour des tests de perf"
+        log 
+        log "Options :"
+        log "--help               : Affiche cette aide."
+        log "--channel CANAL      : Canal mattermost à utiliser, en minuscule, sans espaces ou tirets, parmi ${CHANNEL_NAMES}. Par défaut: ${DEFAULT_CHANNEL}"
+        log
+        
+        exit 1
+}
+
+parse_args() {
+    while [ $# -gt 0 ]
+    do
+        case "${1/--/-}" in
+            "-h"*)
+                shift
+                usage
+                ;;
+            "-c"*)
+                shift
+                CHANNEL_NAME="$1"
+                ;;
+            *)
+            	MESSAGE="$@"
+            	return
+                ;;
+        esac
+        shift
+    done
+}
+
+
+get_channel() {
+	local NAME="$1"
+	
+	if grep --quiet --extended-regexp '^@' <<<"$CHANNEL_NAME"; then
+		local USER_ID=$(curl --silent --request GET --header "authorization: Bearer ${TOKEN}" http://mattermost.dune.thales:80/api/v4/users/username/$(sed s/^@// <<<"${NAME}") | jq --raw-output .id)
+		local MY_ID=$(curl --silent --request GET --header "authorization: Bearer ${TOKEN}" http://mattermost.dune.thales:80/api/v4/users/me | jq --raw-output .id)
+		curl --silent --request POST --header "authorization: Bearer ${TOKEN}" http://mattermost.dune.thales:80/api/v4/channels/direct --data '["'"${USER_ID}"'", "'"${MY_ID}"'"]' | jq --raw-output .id
+	else
+		#local TEAM_ID=$(curl --silent --request POST --header "authorization: Bearer ${TOKEN}" http://mattermost.dune.thales:80/api/v4/teams/search --data '{"term": "'"${TEAM_NAME}"'"}' | jq --raw-output .[0].id)
+		#curl --silent --request POST --header "authorization: Bearer ${TOKEN}" http://mattermost.dune.thales:80/api/v4/teams/${TEAM_ID}/channels/search --data '{"term": "'"${NAME}"'"}' | jq --raw-output 
+		curl --silent --request GET --header "authorization: Bearer ${TOKEN}" http://mattermost.dune.thales:80/api/v4/channels | jq --raw-output ".[] | select(.team_name == \"dune\") | select(.name == \"${NAME}\" or .display_name == \"${NAME}\") | .id"
+	fi
+}
+
+list_channels() {
+	curl --silent --request GET --header "authorization: Bearer ${TOKEN}" http://mattermost.dune.thales:80/api/v4/channels | jq ".[] | select(.team_name == 'dune')"
+}
+
+parse_args "$@"
+CHANNEL_ID=$(get_channel "${CHANNEL_NAME}")
+curl --request POST --header "authorization: Bearer ${TOKEN}" --header 'Content-Type: application/json' http://mattermost.dune.thales:80/api/v4/posts --data "{\"channel_id\":\"${CHANNEL_ID}\", \"message\":\"${MESSAGE}\"}"

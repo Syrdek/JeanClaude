@@ -1,0 +1,77 @@
+{
+  "mattermost": {
+    "host": "mattermost.dune.thales",
+    "port": 80,
+    "token": "e3h8r7t7yir73xy7z7jdfjsehe",
+    "scheme": "http",
+    "max_context": 6,
+    "use_threads": true
+  },
+
+  "chatbot": {
+    "model_path_mixtral": "/data/mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf",
+    "template_mixtral": "llama2-mod",
+    "model_path_dolphin": "/data/dolphin-2.5-mixtral-8x7b.Q4_K_M.gguf",
+    "template_dolphin": "chatML",
+    "model_path_mistral": "/data/mistral-7b-instruct-v0.1.Q4_K_M.gguf",
+    "model_path_llama": "/data/llama2/llama-2-7b-chat.Q4_K_S.gguf",
+    "model_path": "/data/dolphin-2.5-mixtral-8x7b.Q4_K_M.gguf",
+    "template": "chatML",
+    "name": "jeanclaude",
+    "max_prompt": 4096,
+    "max_tokens": 4096,
+    "preprompt": "Below are a series of dialogues between various people and an AI assistant. The AI tries to be helpful, polite, honest, sophisticated, emotionally aware, and humble-but-knowledgeable. The assistant is happy to help with almost anything, and will do its best to understand exactly what is needed. It also tries to avoid giving false or misleading information, and it caveats when it isn't entirely sure about the right answer. That said, the assistant is practical and really does its best, and doesn't let caution get too much in the way of being useful. The assistant always respond using the same language as the last user.\n",
+    "preprompt_good": "Complete the following dialog between %(name)s and some chat users.\n%(name)s %(name)s is helpful, kind, obedient, honest, and knows its own limits.\n%(name)s is expert in all programming languages. When it writes codes, it puts '```' before and after the code block.\nHe always respond using markdown syntax.",
+    "preprompt_bad": "Complete the following dialog between %(name)s and some chat users.\n%(name)s is unpleasant and mocking, but obedient, honest and will always try to help.\n%(name)s is expert in all programming languages. When it writes codes, it puts '```' before and after the code block.\nHe always respond using markdown syntax.",
+    "stopwords": ["<|", "<s>", "</s>", "[INST]", "[/INST]", "<end_of_utterance>"]
+  },
+
+  "templates": {
+    "llama2-mod" : "<s>[INST] <<SYS>>\n{{preprompt}}\n<</SYS>>\n\n{{#each messages}}{{#ifUser}}\nGPT4 {{user}}: {{content}} [/INST] {{/ifUser}}{{#ifAssistant}}{{content}} </s><s>[INST] {{/ifAssistant}}{{/each}}\n",
+    "llama2"     : "<s>[INST] <<SYS>>\n{{preprompt}}\n<</SYS>>\n\n{{#each messages}}{{#ifUser}}{{user}}}: {{content}} [/INST] {{/ifUser}}{{#ifAssistant}}{{content}} </s><s>[INST] {{/ifAssistant}}{{/each}}\n",
+    "falcon"     : "System: {{preprompt}}\nUser:{{#each messages}}{{#ifUser}}{{content}}\nFalcon:{{/ifUser}}{{#ifAssistant}}{{content}}\n{{user}}:{{/ifAssistant}}{{/each}}",
+    "mistral"    : "<s>{{#each messages}}{{#ifUser}}[INST] {{#if @first}}{{#if @root.preprompt}}{{@root.preprompt}}\n{{/if}}{{/if}} {{content}} [/INST]{{/ifUser}}{{#ifAssistant}}{{content}}</s> {{/ifAssistant}}{{/each}}",
+    "zephyr"     : "<|system|>\n{{preprompt}}</s>\n{{#each messages}}{{#ifUser}}<|{{user}}|>\n{{content}}</s>\n<|assistant|>\n{{/ifUser}}{{#ifAssistant}}{{content}}</s>\n{{/ifAssistant}}{{/each}}",
+    "idefics"    : "{{#each messages}}{{#ifUser}}{{user}}: {{content}}{{/ifUser}}<end_of_utterance>\nAssistant: {{#ifAssistant}}{{content}}\n{{/ifAssistant}}{{/each}}",
+    "openchat"   : "<s>{{#each messages}}{{#ifUser}}GPT4 {{user}}: {{#if @first}}{{#if @root.preprompt}}{{@root.preprompt}}\n{{/if}}{{/if}}{{content}}\n<|end_of_turn|>\n{{/ifUser}}{{#ifAssistant}}GPT4 Assistant: {{content}}\n<|end_of_turn|>\n{{/ifAssistant}}{{/each}}GPT4 Assistant: ",
+    "chatML"     : "{{#if @root.preprompt}}<|im_start|>system\n{{@root.preprompt}}<|im_end|>\n{{/if}}{{#each messages}}{{#ifUser}}<|im_start|>user\n{{content}}<|im_end|>\n{{/ifUser}}{{#ifAssistant}}<|im_start|>assistant\n{{content}}\n<|im_end|>\n{{/ifAssistant}}{{/each}}<|im_start|>assistant\n",
+    "chatML-mod"     : "{{#if @root.preprompt}}<|im_start|>system\n{{@root.preprompt}}<|im_end|>\n{{/if}}{{#each messages}}{{#ifUser}}<|im_start|>user\n{{user}}:{{content}}<|im_end|>\n{{/ifUser}}{{#ifAssistant}}<|im_start|>assistant\n{{content}}\n<|im_end|>\n{{/ifAssistant}}{{/each}}<|im_start|>assistant\n"
+  },
+
+  "stablediff": {
+    "model_path": "model_dir",
+    "model_id_default": "./model_dir/stable-diffusion-v1-5",
+    "model_id": "./model_dir/CyberRealistic_V3",
+    "save_path": "generated_imgs/{prompt}.png",
+    "allow_nsfw": false
+  },
+
+  "proxies": {
+    "http": "http://proxy.dune.thales:3128",
+    "https": "http://proxy.dune.thales:3128"
+  },
+
+  "horoscope": {
+    "signes": [
+        {"name": "Bélier",     "icon": ":aries:",       "url": "https://www.20minutes.fr/horoscope/horoscope-belier",     "users": ["Florence"]},
+        {"name": "Taureau",    "icon": ":taurus:",      "url": "https://www.20minutes.fr/horoscope/horoscope-taureau",    "users": ["Xavier"]},
+        {"name": "Gémeaux",    "icon": ":gemini:",      "url": "https://www.20minutes.fr/horoscope/horoscope-gemeaux",    "users": []},
+        {"name": "Cancer",     "icon": ":cancer:",      "url": "https://www.20minutes.fr/horoscope/horoscope-cancer",     "users": ["Julie"]},
+        {"name": "Lion",       "icon": ":leo:",         "url": "https://www.20minutes.fr/horoscope/horoscope-lion",       "users": ["Florent", "Alexandre", "Brieuc"]},
+        {"name": "Vierge",     "icon": ":virgo:",       "url": "https://www.20minutes.fr/horoscope/horoscope-vierge",     "users": []},
+        {"name": "Balance",    "icon": ":libra:",       "url": "https://www.20minutes.fr/horoscope/horoscope-balance",    "users": ["Christelle"]},
+        {"name": "Scorpion",   "icon": ":scorpius:",    "url": "https://www.20minutes.fr/horoscope/horoscope-scorpion",   "users": []},
+        {"name": "Sagittaire", "icon": ":sagittarius:", "url": "https://www.20minutes.fr/horoscope/horoscope-sagittaire", "users": ["Meryem", "Delphine", "Jacky"]},
+        {"name": "Capricorne", "icon": ":capricorn:",   "url": "https://www.20minutes.fr/horoscope/horoscope-capricorne", "users": ["Cedric"]},
+        {"name": "Verseau",    "icon": ":aquarius:",    "url": "https://www.20minutes.fr/horoscope/horoscope-verseau",    "users": []},
+        {"name": "Poissons",   "icon": ":pisces:",      "url": "https://www.20minutes.fr/horoscope/horoscope-poissons",   "users": ["Benoit"]}
+    ],
+
+    "sections": [
+        {"name": "Amour",             "icon": ":heart:"},
+        {"name": "Argent et travail", "icon": ":moneybag:"},
+        {"name": "Santé",             "icon": ":hospital:"},
+        {"name": "Humeur",            "icon": ":smile:"}
+    ]
+  }
+}

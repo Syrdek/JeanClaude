@@ -1,0 +1,14 @@
+[Unit]
+Description=Matterbot
+After=network-online.target
+
+[Service]
+ExecStart=/opt/matterbot/run.sh
+StandardInput=tty
+StandardOutput=tty
+TTYPath=/dev/tty11
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
