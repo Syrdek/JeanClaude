@@ -8,7 +8,7 @@ export FORCE_CMAKE=1
 export USE_NNPACK=0
 export PIP="$PYTHON -m pip --trusted-host pypi.python.org --trusted-host pypi.org --trusted-host files.pythonhosted.org --proxy='192.168.0.59:3128'"
 
-test 
+
 test -d venv || $PYTHON -m venv venv
 . venv/bin/activate
 $PIP install pip
