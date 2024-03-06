@@ -1,0 +1,12 @@
+[Unit]
+Description=JeanClaudePlugin
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/opt/matterbot/gradio.sh
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
